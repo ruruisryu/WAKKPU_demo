@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#2d2a2e" />
+    <meta name="description" content="왁스를 직접 부수는 손맛과 일꾼을 배치하는 말랑이 가게 운영이 서로 성장시키는 왁뿌 클리커 웹 실험 버전." />
+    <title>왁뿌 말랑이 가게</title>
+    <script type="module" crossorigin src="./assets/index-NpfNeRBy.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BAl5xwY8.css">
+  </head>
+  <body>
+    <div id="app" class="booting" data-tab="bench">
+      <header id="hud">
+        <div class="brand" aria-hidden="true">왁뿌<small>말랑이 가게</small></div>
+        <div class="stat coin" title="코인 — 고용·구역 개방·설비에 써요.">
+          <span class="hic" data-ic="coin" data-deco></span><span class="lbl">코인</span><b id="coins">0</b><small id="coin-rate">+0/초</small>
+        </div>
+        <div class="stat research" title="연구 (누적, 쓰지 않음) — 새 말랑이·코팅·도구 조건">
+          <span class="hic" data-ic="research" data-deco></span><span class="lbl">연구</span><b id="research">0</b><small id="research-rate">+0/초</small>
+        </div>
+        <div class="stat rating" id="rating-stat" title="별점 — 오르내리며 수요를 바꿔요. 최고 별점과 리뷰 수는 고용·가게 확장 조건(줄지 않음)">
+          <span class="hic" data-ic="star" data-deco></span><span class="lbl">별점</span><b id="rating">3.0</b><small id="rating-sub">최고 3.0 · 리뷰 0</small>
+        </div>
+        <div class="stat staff" title="일꾼 — 배치 / 전체">
+          <span class="hic" data-ic="worker" data-deco></span><span class="lbl">일꾼</span><b id="staff">0/0</b><small id="staff-idle"></small>
+        </div>
+        <button id="goal-line" class="goal-line" type="button" aria-label="다음 목표 보기 — 해당 업그레이드 분류로 이동"></button>
+        <span id="save-state" class="save-state" role="status"></span>
+        <button id="settings-open" class="icon-btn" type="button" aria-label="설정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.1 4.6 1.9 1.4-2 3.4-2.2-.9a7.6 7.6 0 0 1-2 1.2L15.5 21h-4l-.3-2.3a7.6 7.6 0 0 1-2-1.2l-2.2.9-2-3.4 1.9-1.4a7.8 7.8 0 0 1 0-2.3L5 9.9l2-3.4 2.2.9a7.6 7.6 0 0 1 2-1.2l.3-2.2h4l.3 2.3a7.6 7.6 0 0 1 2 1.2l2.2-.9 2 3.4-1.9 1.4a7.8 7.8 0 0 1 0 2.3Z"/></svg></button>
+      </header>
+
+      <main id="main">
+        <div id="left">
+          <section id="shop-panel" aria-labelledby="shop-title">
+            <header class="panel-head"><h2 id="shop-title">말랑이 가게</h2><span id="shop-summary"></span></header>
+            <div id="zones" class="map" role="group" aria-label="가게 지도 — 구역을 누르면 아래에 자세히 나와요"></div>
+            <p id="shop-hint" class="shop-hint" aria-live="polite"></p>
+          </section>
+          <section id="zone-detail" aria-labelledby="zd-title">
+            <header class="panel-head"><button type="button" id="zd-close" class="btn small" hidden aria-label="가게 한눈에 보기로 돌아가기 (Esc)" title="가게 한눈에 보기로 (Esc)">← 뒤로</button><h2 id="zd-title">가게 한눈에 보기</h2><span id="zd-cap"></span></header>
+            <div id="zd-body"></div>
+            <button type="button" id="shop-growth" class="btn growth-btn" hidden></button>
+          </section>
+        </div>
+        <div id="right">
+          <nav id="tabs" role="tablist" aria-label="작업대·업그레이드 화면 전환">
+            <button type="button" role="tab" data-tab="bench" aria-selected="true">작업대</button>
+            <button type="button" role="tab" data-tab="goals" aria-selected="false">업그레이드<i id="tab-goals-dot" hidden></i></button>
+          </nav>
+          <section id="bench-panel" aria-label="직접 파쇄 작업대">
+            <div id="bench-host">
+              <canvas id="scene" tabindex="0" aria-label="3D 왁스 작업대. 누르기 도구로 꾹 누르면 왁스가 갈라져요. 키보드: Space 누르기, 화살표 돌리기, 1·2·3 도구."></canvas>
+            </div>
+            <div id="model-strip" role="group" aria-label="말랑이 선택"></div>
+            <div id="session-card" aria-live="polite"></div>
+            <div id="bench-notice" hidden></div>
+            <div id="bench-overlay" hidden><span class="spinner" aria-hidden="true"></span><p id="bench-overlay-text"></p><button id="bench-retry" type="button" class="btn" hidden>다시 시도</button></div>
+            <div id="tool-dock" role="group" aria-label="작업 도구">
+              <button type="button" data-tool="press" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 13V5a2 2 0 0 1 4 0v7-4a2 2 0 0 1 4 0v4-2a2 2 0 0 1 4 0v6c0 4-3 6-6 6h-1c-2 0-4-1-5-3l-4-5a2 2 0 0 1 3-2l1 1"/></svg>누르기<kbd>1</kbd></button>
+              <button type="button" data-tool="rotate" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6a9 9 0 0 1 14 6M17 18A9 9 0 0 1 3 12M7 2v4h4m6 16v-4h-4"/></svg>돌리기<kbd>2</kbd></button>
+              <button type="button" data-tool="sweep" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19 3-7 9m-4-2 7 5-5 7-8-6 6-6Zm-2 6 4 3"/></svg>쓸기<kbd>3</kbd></button>
+              <span class="dock-sep" aria-hidden="true"></span>
+              <button type="button" id="clear-btn" title="떨어진 조각 정리"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></svg>정리</button>
+              <button type="button" id="reset-btn" title="왁스 모양 처음부터 (R) — 보상 회차는 그대로"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/></svg>처음부터</button>
+              <button type="button" id="fit-btn" title="시점 맞추기 (F)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>시점</button>
+            </div>
+            <div id="pressure" aria-hidden="true"><i></i></div>
+          </section>
+
+          <section id="goals-panel" aria-labelledby="goals-title">
+            <header class="panel-head"><h2 id="goals-title">업그레이드·해금</h2><span id="goals-summary"></span></header>
+            <div id="guide"></div>
+            <div id="cat-tabs" role="tablist" aria-label="업그레이드 분류"></div>
+            <div id="goals" role="tabpanel" tabindex="0" aria-labelledby="cat-staff">
+              <div id="staff-subtabs" class="subtabs" role="tablist" aria-label="일꾼 세부 분류" hidden></div>
+              <p id="goals-lead" class="cat-lead"></p>
+              <div id="worker-growth" hidden></div>
+              <div id="goals-list"></div>
+              <p id="goals-empty" class="empty" hidden></p>
+              <button type="button" id="goals-done-toggle" class="done-toggle" aria-expanded="false" aria-controls="goals-done" hidden></button>
+              <ul id="goals-done" class="done-list" hidden></ul>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <div id="fx-layer" aria-hidden="true"></div>
+      <div id="drag-ghost" aria-hidden="true" hidden></div>
+      <div id="toast-layer" aria-live="polite"></div>
+
+      <div id="settings" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="panel">
+          <h2 id="settings-title">설정</h2>
+          <div class="sliders">
+            <label class="slider"><span>전체 음량</span><input type="range" min="0" max="100" data-vol="master" /><output></output></label>
+            <label class="slider"><span>직접 파쇄 소리</span><input type="range" min="0" max="100" data-vol="direct" /><output></output></label>
+            <label class="slider"><span>일꾼 소리</span><input type="range" min="0" max="100" data-vol="auto" /><output></output></label>
+            <label class="slider"><span>버튼·알림</span><input type="range" min="0" max="100" data-vol="ui" /><output></output></label>
+          </div>
+          <div class="textsize" role="radiogroup" aria-label="글자 크기">
+            <span>글자 크기</span>
+            <button type="button" role="radio" data-ts="1">작게</button>
+            <button type="button" role="radio" data-ts="1.2">보통</button>
+            <button type="button" role="radio" data-ts="1.4">크게</button>
+            <button type="button" role="radio" data-ts="1.6">아주 크게</button>
+          </div>
+          <div class="toggles">
+            <button type="button" class="toggle" id="mute-toggle" aria-pressed="false"><i></i><span>전체 음소거</span></button>
+            <button type="button" class="toggle" id="motion-toggle" aria-pressed="false"><i></i><span>움직임 줄이기</span></button>
+            <button type="button" class="toggle" id="quality-toggle" aria-pressed="false"><i></i><span>저사양 그래픽</span></button>
+            <button type="button" class="toggle" id="style-toggle" aria-pressed="false"><i></i><span>입체 작업대(예전 그림)</span></button>
+          </div>
+          <p class="settings-note" id="audio-status"></p>
+          <button type="button" class="btn small" id="audio-retry" hidden>소리 다시 불러오기</button>
+          <p class="settings-note">다른 탭을 봐도 가게는 계속 돌아가고, 창을 닫은 동안에만 쉬어요(오프라인 생산 없음). 그래픽 설정은 보상에 영향을 주지 않아요.</p>
+          <div class="panel-actions">
+            <button type="button" class="btn danger" id="reset-open">새 게임</button>
+            <button type="button" class="btn primary" id="settings-close">닫기</button>
+          </div>
+          <div class="confirm" id="reset-confirm-box" hidden>
+            <p>이 버전(v0.8.0)의 진행을 지우고 새로 시작할까요? 다른 버전 저장은 건드리지 않아요.</p>
+            <div class="panel-actions"><button type="button" class="btn" id="reset-cancel">취소</button><button type="button" class="btn danger" id="reset-confirm">지우고 시작</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="confirm" class="modal" hidden role="alertdialog" aria-modal="true" aria-labelledby="confirm-text">
+        <div class="panel small">
+          <p id="confirm-text"></p>
+          <div class="panel-actions"><button type="button" class="btn" id="confirm-no">취소</button><button type="button" class="btn primary" id="confirm-yes">확인</button></div>
+        </div>
+      </div>
+
+      <div id="title" class="title">
+        <div class="logo"><div class="logo-top">왁뿌</div><div class="logo-main">말랑이 가게</div><div class="logo-sub">직접 부수고, 일꾼을 배치하고</div></div>
+        <div class="loader" id="loader"><div class="bar"><i id="load-bar"></i></div><span id="load-text">불러오는 중…</span></div>
+        <button type="button" class="tap-start" id="tap-start" hidden>눌러서 시작</button>
+        <p class="title-note" id="title-note"></p>
+      </div>
+    </div>
+  </body>
+</html>
